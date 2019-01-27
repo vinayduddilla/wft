@@ -9,16 +9,21 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.senslytics.data.camel.CamelHelper;
+
 public class ExcelFileReader {
 
 	static String[] excelFormats = { ".xls", ".xlsb", ".xlsm", ".xlsx" };
-	static String fileName = "c:/files/FileDataMnemonics.xlsx";
+	static String fileName = "c:\\files\\FileDataMnemonics.xlsx";
 
 	public static void main(String[] args) throws IOException {
 		try {
-			System.out.println("Reading files ");
-			readFile();
-			System.out.println("Files read");
+			System.out.println("Reading file.. ");
+			//readFile(fileName);
+			System.out.println("File reading complete");
+			CamelHelper.getInstance().camelBoot();
+			Thread.sleep(5*60*60);
+			CamelHelper.getInstance().getCamelContext().stop();
 		} catch (InvalidFormatException ife) {
 			ife.printStackTrace();
 		} catch (Exception e) {
@@ -26,20 +31,20 @@ public class ExcelFileReader {
 		}
 	}
 
-	public static void readFile() throws IOException, InvalidFormatException {
+	public static void readFile(String fileName) throws IOException, InvalidFormatException {
 
 		File file = new File(fileName);
 		Workbook workBook = WorkbookFactory.create(file);
 		for (int sheetNumber = 0; sheetNumber < workBook.getNumberOfSheets(); sheetNumber++) {
 			Sheet sheet = workBook.getSheetAt(sheetNumber);
 			Iterator<Row> it = sheet.iterator();
-			System.out.println("Sheet number - " + sheetNumber);
+			System.out.println("Sheet number - " + sheetNumber + " - "  + workBook.getSheetName(sheetNumber) );
 			while (it.hasNext()) {
-				Row r = it.next();
-				int cellNumbers = r.getPhysicalNumberOfCells();
+				Row row = it.next();
+				int cellNumbers = row.getPhysicalNumberOfCells();
 				String preparedRow = "";
 				for (int cellNumber = 0; cellNumber < cellNumbers; cellNumber++) {
-					preparedRow +=  "       " + r.getCell(cellNumber);
+					preparedRow +=  "       " + row.getCell(cellNumber);
 				}
 				System.out.println(preparedRow);
 			}
